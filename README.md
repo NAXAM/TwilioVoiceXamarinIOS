@@ -11,7 +11,8 @@ Twilio Voice iOS SDK binding for Xamarin
 
 ### Twilio.Voice iOS 5.0.0 (September 19, 2019)
 ```
-sh bootstrapper.sh
+sh get-framework.sh
+sh build.sh
 ```
 
 Add --registrar:static as additional mtouch arguments on iOS Build dialog for your iOS application

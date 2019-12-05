@@ -1,52 +1,66 @@
 using System;
-using System.Runtime.InteropServices;
+using CoreAnimation;
+using CoreFoundation;
+using CoreGraphics;
+using CoreLocation;
 using Foundation;
 using ObjCRuntime;
+using UIKit;
+using System.Runtime.InteropServices;
 
 namespace Twilio.Voice.iOS
 {
+	// typedef void (^TVOAudioDeviceWorkerBlock)();
+	delegate void TVOAudioDeviceWorkerBlock();
+
+	public static class CFunctions
+	{
+		// extern void TVOAudioDeviceFormatChanged (TVOAudioDeviceContext _Nonnull context);
+		[DllImport("__Internal")]
+		//[Verify(PlatformInvoke)]
+		static extern unsafe void TVOAudioDeviceFormatChanged(void* context);
+
+		// extern void TVOAudioDeviceWriteCaptureData (TVOAudioDeviceContext _Nonnull context, int8_t * _Nonnull data, size_t sizeInBytes);
+		[DllImport("__Internal")]
+		//[Verify(PlatformInvoke)]
+		static extern unsafe void TVOAudioDeviceWriteCaptureData(void* context, sbyte* data, nuint sizeInBytes);
+
+		// extern void TVOAudioDeviceReadRenderData (TVOAudioDeviceContext _Nonnull context, int8_t * _Nonnull data, size_t sizeInBytes);
+		[DllImport("__Internal")]
+		//[Verify(PlatformInvoke)]
+		static extern unsafe void TVOAudioDeviceReadRenderData(void* context, sbyte* data, nuint sizeInBytes);
+
+		// extern void TVOAudioDeviceExecuteWorkerBlock (TVOAudioDeviceContext _Nonnull context, TVOAudioDeviceWorkerBlock _Nonnull block);
+		[DllImport("__Internal")]
+		//[Verify(PlatformInvoke)]
+		static extern unsafe void TVOAudioDeviceExecuteWorkerBlock(void* context, TVOAudioDeviceWorkerBlock block);
+
+		// extern void TVOAudioSessionActivated (TVOAudioDeviceContext _Nonnull context);
+		[DllImport("__Internal")]
+		//[Verify(PlatformInvoke)]
+		static extern unsafe void TVOAudioSessionActivated(void* context);
+
+		// extern void TVOAudioSessionDeactivated (TVOAudioDeviceContext _Nonnull context);
+		[DllImport("__Internal")]
+		//[Verify(PlatformInvoke)]
+		static extern unsafe void TVOAudioSessionDeactivated(void* context);
+	}
+
 	[Native]
 	public enum TVOIceTransportPolicy : ulong
 	{
-		All = 0,
-		Relay = 1
-	}
-
-	static class CFunctions
-	{
-		// extern void TVOAudioDeviceFormatChanged (TVOAudioDeviceContext _Nonnull context);
-		[Export("TVOAudioDeviceFormatChanged")]
-		static extern unsafe void TVOAudioDeviceFormatChanged (void* context);
-
-		// extern void TVOAudioDeviceWriteCaptureData (TVOAudioDeviceContext _Nonnull context, int8_t * _Nonnull data, size_t sizeInBytes);
-		[Export("TVOAudioDeviceWriteCaptureData")]
-		static extern unsafe void TVOAudioDeviceWriteCaptureData (void* context, sbyte* data, nuint sizeInBytes);
-
-		// extern void TVOAudioDeviceReadRenderData (TVOAudioDeviceContext _Nonnull context, int8_t * _Nonnull data, size_t sizeInBytes);
-		[Export("TVOAudioDeviceReadRenderData")]
-		static extern unsafe void TVOAudioDeviceReadRenderData (void* context, sbyte* data, nuint sizeInBytes);
-
-		// extern void TVOAudioDeviceExecuteWorkerBlock (TVOAudioDeviceContext _Nonnull context, TVOAudioDeviceWorkerBlock _Nonnull block);
-		[Export("TVOAudioDeviceExecuteWorkerBlock")]
-		static extern unsafe void TVOAudioDeviceExecuteWorkerBlock (void* context, IntPtr block);
-
-		// extern void TVOAudioSessionActivated (TVOAudioDeviceContext _Nonnull context);
-		[Export("TVOAudioSessionActivated")]
-		static extern unsafe void TVOAudioSessionActivated (void* context);
-
-		// extern void TVOAudioSessionDeactivated (TVOAudioDeviceContext _Nonnull context);
-		[Export("TVOAudioSessionDeactivated")]
-		static extern unsafe void TVOAudioSessionDeactivated (void* context);
+		All = 0,   ///< All transports will be used.
+		Relay = 1  ///< Only TURN relay transports will be used.
 	}
 
 	[Native]
 	public enum TVOCallState : ulong
 	{
-		Connecting = 0,
-		Ringing,
-		Connected,
-		Reconnecting,
-		Disconnected
+		Connecting = 0, ///< The Call is connecting.
+		Ringing,        ///< The Call is ringing.
+		Connected,      ///< The Call is connected.
+		Reconnecting,   ///< The Call is reconnecting.
+		Disconnected    ///< The Call is disconnected.
 	}
 
 	[Native]
@@ -73,7 +87,7 @@ namespace Twilio.Voice.iOS
 	}
 
 	[Native]
-	public enum TVOError : ulong
+	public enum TVOError : long
 	{
 		AccessTokenInvalidError = 20101,
 		AccessTokenHeaderInvalidError = 20102,
